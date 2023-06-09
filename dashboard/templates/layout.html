@@ -1,62 +1,94 @@
+{% set links = [
+    (url_for('dashboard'), 'dashboard', 'Dashboard', 'bi-menu-button-wide'),
+    (url_for('environment'), 'environment', 'Environment', 'bi-cloud-drizzle-fill')
+]
+%}
+
 <!doctype html>
 <html lang="en" data-bs-theme="dark">
-  <head>
+<head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-      <link href="{{ url_for('static', filename='bootstrap.min.css') }}" rel="stylesheet">
-      <style>
-    .data-minmax {
-      font-size: 0.7em;
-      margin-top: -5px;
-      margin-left: 5px;
-      margin-bottom: -7px;
-    }
+    <link href="{{ url_for('static', filename='bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='bootstrap-icons.min.css') }}" rel="stylesheet">
+    <script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
+    {% if active_page == 'environment' %}
+    <link href="{{ url_for('static', filename='datepicker.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='environment.css') }}" rel="stylesheet">
+    {% endif %}
+    <style>
+        .data-minmax {
+            font-size: 0.7em;
+            margin-top: -5px;
+            margin-left: 5px;
+            margin-bottom: -7px;
+        }
 
-    .description {
-      font-size: 1.0em;
-      margin: 0 5px;
-    }
+        .description {
+            font-size: 1.0em;
+            margin: 0 5px;
+        }
 
-    .dashboard-stats, .small-font {
-    }
+        .dashboard-stats .list-group-item {
+            padding: 7px 7px;
+        }
 
-    .dashboard-stats .list-group-item {
-      padding: 7px 7px;
-    }
+        .dashboard-stats .col-md-4, .dashboard-stats .col-lg-4 {
+            padding-left: 5px;
+            padding-right: 5px;
+        }
 
-    .dashboard-stats .col-md-3, .dashboard-stats .col-md-4, .dashboard-stats .col-md-5, .dashboard-stats .col-md-6, .dashboard-stats .col-md-7, .col-md-8, .dashboard-stats .col-md-12 {
-      padding-left: 5px;
-      padding-right: 5px;
-    }
-    .dashboard-stats .list-group-header {
-      font-size: 1.2em;
-      padding: 5px 7px;
-    }
+        .dashboard-stats .list-group-header {
+            font-size: 1.2em;
+            padding: 5px 7px;
+        }
 
-.thumb-panel {
-  padding: 0; height: 107px; width: 190px; overflow: hidden; margin: auto auto;
-}
+        .thumb-panel {
+            padding: 0;
+            height: 107px;
+            width: 190px;
+            overflow: hidden;
+            margin: auto auto;
+        }
 
-.camera-label {
-  position: absolute;
-  font-weight: bold;
-  font-size: 0.9em;
-  top: 0px;
-  left: 0px;
-  padding: 3px 6px;
-  background-color: rgb(0, 0, 0, 0.6);
-  color: white;
-  border-bottom-right-radius: 5px;
-}
-  </style>
+        .camera-label {
+            position: absolute;
+            font-weight: bold;
+            font-size: 0.9em;
+            top: 0px;
+            left: 0px;
+            padding: 3px 6px;
+            background-color: rgb(0, 0, 0, 0.6);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+    </style>
 
     <title>{{ title|safe }}</title>
-  </head>
-  <body>
-    <script src="{{ url_for('static', filename='bootstrap.bundle.min.js') }}"></script>
-    <div class="container">
-      {% block body %}{% endblock %}
-    </div>
-  </body>
+</head>
+<body>
+<script src="{{ url_for('static', filename='bootstrap.bundle.min.js') }}"></script>
+    <nav class="navbar navbar-expand navbar-light bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Windmill Hill Observatory</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbar">
+                <ul class="navbar-nav ms-auto gap-2">
+                {% for href, id, label, icon in links %}
+                    <li class="nav-item">
+                        <a class="btn btn-outline-secondary{% if id == active_page %} active{% endif %}" href="{{ href|e }}"><i class="{{ icon }}" style="margin-right:5px"></i>{{ label|e }}</a>
+                    </li>
+                 {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+<div class="container">
+    {% block body %}{% endblock %}
+</div>
+</body>
 </html>

@@ -17,10 +17,14 @@
 import json
 import os.path
 
+from astropy.time import Time
+import astropy.units as u
+
 from flask import abort
 from flask import Flask
 from flask import jsonify
 from flask import render_template
+from flask import request
 from flask import send_from_directory
 
 # pylint: disable=missing-docstring
@@ -38,7 +42,7 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = -1
 
 
 @app.route('/data/<path:path>')
-def clasp_generated_data(path):
+def generated_data(path):
     if path in GENERATED_DATA:
         return send_from_directory(GENERATED_DATA_DIR, GENERATED_DATA[path])
     abort(404)
@@ -54,7 +58,7 @@ class SiteCamera:
 
 
 @app.route('/')
-def main():
+def dashboard():
     cameras = [
         SiteCamera('eumetsat', 'EUMETSAT 10.8 um', source='https://eumetview.eumetsat.int/static-images/MSG/IMAGERY/IR108/BW/index.htm'),
         SiteCamera('dome', 'Dome'),
@@ -63,6 +67,11 @@ def main():
     ]
 
     return render_template('dashboard.html', cameras=cameras)
+
+
+@app.route('/environment')
+def environment():
+    return render_template('environment.html')
 
 
 @app.route('/camera/<path:camera>')
@@ -83,3 +92,27 @@ def camera_thumb(camera):
 def dashboard_data():
     data = json.load(open(GENERATED_DATA_DIR + '/dashboard.json'))
     return jsonify(**data)
+
+
+@app.route('/data/environment')
+def environment_data():
+    path = 'latest.json.gz'
+    if 'date' in request.args:
+        # Map today's date to today.json
+        # HACK: use .datetime to work around missing strftime on ancient astropy
+        now = Time.now()
+        today = Time(now.datetime.strftime('%Y-%m-%d'), format='isot', scale='utc') + 12 * u.hour
+        if today > now:
+            today -= 1 * u.day
+
+        if today.strftime('%Y-%m-%d') == request.args['date']:
+            path = 'today.json.gz'
+        else:
+            # Validate that it is a well-formed date
+            date = Time(request.args['date'], format='isot', scale='utc')
+            path = date.datetime.strftime('%Y/%Y-%m-%d.json.gz')
+
+    response = send_from_directory(GENERATED_DATA_DIR, os.path.join('weather', path))
+    response.headers['Content-Encoding'] = 'gzip'
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    return response

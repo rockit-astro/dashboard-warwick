@@ -1,0 +1,61 @@
+{% extends "layout.html" %}
+{% set title = 'Environment' -%}
+{% set active_page = 'environment' -%}
+{% block body %}
+
+<div class="row mb-2">
+  <div class="col-md-8 col-sm-12 gy-2 mt-auto text-center">
+    <span class="text-truncate" id="data-updated">Loading..</span>
+  </div>
+  <div class="col-md-4 col-sm-12 gy-2">
+    <div class="input-group">
+      <button id="prev-date" class="btn btn-outline-secondary" type="button"><i class="bi bi-arrow-left"></i></button>
+      <input id="datepicker" type="text" placeholder="Live Data" class="form-control" data-provide="datepicker" style="cursor: pointer" readonly>
+      <button id="next-date" class="btn btn-outline-secondary" type="button"><i class="bi bi-arrow-right"></i></button>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-6" style="padding: 0; margin: 0">
+    <div id="temperature-container" class="plot-container">
+      <div id="temperature-plot" data-linkedplots='["humidity-plot", "dewpt-plot", "brightness-plot", "skytemp-plot"]' class="weather-plot" data-type='temperature' data-axislabel='Temp. (&deg;C)' data-labelfudge="-7" data-labelunits='&deg;C' data-hidetime></div>
+    </div>
+    <div id="humidity-container" class="plot-container">
+      <div id="humidity-plot" data-linkedplots='["temperature-plot", "dewpt-plot", "brightness-plot", "skytemp-plot"]' class="weather-plot" data-type='humidity' data-labelcontainer="humidity-labels" data-axislabel='Humidity (%)' data-min="0" data-max="125" data-labelfudge="-7" data-labelunits='%' data-hidetime></div>
+    </div>
+    <div id="dewpt-container" class="plot-container">
+      <div id="dewpt-plot" data-linkedplots='["temperature-plot", "humidity-plot", "skytemp-plot", "brightness-plot"]' class="weather-plot" data-type='dewpt' data-axislabel='T. &gt; Dew Pt. (&deg;C)' data-min="0" data-labelfudge="-7" data-labelunits='&deg;C' data-hidetime></div>
+    </div>
+    <div id="brightness-container" class="plot-container">
+      <div id="brightness-plot" data-linkedplots='["temperature-plot", "humidity-plot", "dewpt-plot", "skytemp-plot"]' class="weather-plot" data-type='brightness' data-axislabel='Darkness (LDR k&ohm;)' data-min="-5" data-max="65" data-labelfudge="-7" data-labelunits='k&ohm;' data-hidetime></div>
+    </div>
+    <div id="skytemp-container" class="plot-container">
+      <div id="skytemp-plot" data-linkedplots='["temperature-plot", "humidity-plot", "dewpt-plot", "brightness-plot"]' class="weather-plot" data-type='skytemp' data-axislabel='Sky Temp. (&deg;C)' data-labelunits='&deg;C' data-min="-15" data-max="60" data-labelfudge="-7"></div>
+    </div>
+  </div>
+  <div class="col-md-6" style="padding: 0; margin: 0" id="right-container">
+    <div id="wind-container" class="plot-container">
+      <div id="wind-plot" class="weather-plot wind-plot" data-sidesensor="right-container" data-type='wind' data-axislabel='Wind (km/h)' data-labelunits='&nbsp;km/h' data-hidetime></div>
+    </div>
+    <div id="windspeed-container" class="plot-container">
+      <div id="windspeed-plot" data-linkedplots='["rainboards-plot"]' class="weather-plot" data-type='wind_speed' data-sidesensor="right-container" data-axislabel="Wind (km/h)" data-labelfudge="-7" data-min="0" data-labelunits='&nbsp;km/h' data-hidetime data-ydecimals="0" data-points></div>
+    </div>
+    <div id="raindetector-container" class="plot-container">
+      <div id="rainboards-plot" data-linkedplots='["windspeed-plot"]' class="weather-plot" data-type='rain' data-sidesensor="right-container" data-axislabel="Rain Det." data-labelfudge="-7" data-min="0" data-max="3.5" data-labelunits='&nbsp;boards' data-ydecimals="0"></div>
+    </div>
+  </div>
+</div>
+<script src="{{ url_for('static', filename='datepicker.min.js') }}"></script>
+<script src="{{ url_for('static', filename='jquery.flot.min.js') }}"></script>
+<script src="{{ url_for('static', filename='jquery.flot.resize.min.js') }}"></script>
+<script src="{{ url_for('static', filename='jquery.flot.time.min.js') }}"></script>
+<script src="{{ url_for('static', filename='jquery.flot.axislabels.js') }}"></script>
+<script src="{{ url_for('static', filename='jquery.flot.errorbars.min.js') }}"></script>
+<script src="{{ url_for('static', filename='jquery.flot.crosshair.min.js') }}"></script>
+<script src="{{ url_for('static', filename='environment.js') }}"></script>
+<script>
+  var dataURL = '{{ url_for('environment_data') }}';
+  $(document).ready(setup);
+</script>
+{% endblock %}

@@ -1,5 +1,6 @@
 {% extends "layout.html" %}
 {% set title = 'Windmill Hill Dashboard' -%}
+{% set active_page = 'dashboard' -%}
 {% block body %}
 
 <div class="row dashboard-stats mb-2">
@@ -100,8 +101,6 @@
 {% endfor %}
 </div>
 
-<script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
-<script src="{{ url_for('static', filename='common.js') }}"></script>
 <script src="{{ url_for('static', filename='dashboard.js') }}"></script>
 <script>
   function reloadImages() {

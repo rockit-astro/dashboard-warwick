@@ -1,0 +1,59 @@
+
+#content {
+  width: 880px;
+  margin: 0 auto;
+  padding: 10px;
+}
+
+.plot-container {
+  height: 155px;
+  padding: 0;
+  margin: 0;
+}
+
+.weather-plot {
+  width: 100%;
+  height: 100%;
+  font-size: 14px;
+  line-height: 1.2em;
+}
+
+.wind-labels {
+  position:absolute;
+  font-size:smaller;
+  width:20px;
+  height:20px
+}
+
+.xAxis, .yAxis { color: #fff; }
+.legendLabel { width: 48px; height: 17px; font-size: 9px; }
+.legendColorBox { display: none }
+.axisLabels { text-align: center; font-size: 12px; }
+
+.datepicker tfoot tr th {
+  text-align: center;
+  border-radius: 3px;
+}
+
+.datepicker table tr td.day:hover,
+.datepicker-months table tr td span:hover,
+.datepicker-years table tr td span:hover,
+.datepicker thead tr:first-child th:hover,
+.datepicker tfoot tr th:hover {
+  background: #4d5364;
+  color:#fff;
+}
+
+.datepicker table tr td.disabled:hover {
+  background: #fff;
+  color: #cfd2da;
+}
+
+#rdboards-label td.legendLabel, #vrain-label td.legendLabel { width: 145px; }
+#humidity-container, #temperature-container, #dewpt-container, #brightness-container, #skytemp-container, #windspeed-container, #raindetector-container { height: 105px; }
+#skytemp-container { height: 139px; }
+#windspeed-container { height: 80px; }
+#raindetector-container { height: 114px; }
+#dewpt-container, #brightness-container, #temperature-container, #humidity-container, #skytemp-container, #windspeed-container, #raindetector-container { margin-top: -5px; }
+#windspeed-container { margin-top: -20px; }
+#wind-container { height: 365px; }
