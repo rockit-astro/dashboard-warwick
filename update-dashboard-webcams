@@ -38,7 +38,6 @@ import astropy.units as u
 BASE_OUTPUT_DIR = '/var/www/dashboard/generated/'
 EUMETSAT_URL = 'https://eumetview.eumetsat.int/static-images/MSG/IMAGERY/IR108/BW/WESTERNEUROPE/'
 DOME_URL = 'http://172.19.0.163/cgi-bin/snapshot.cgi'
-ACP_URL = 'http://172.19.0.160/images/lastimage.png'
 TIME_UNKNOWN = Time('2000-01-01T12:00:00')
 
 
@@ -123,37 +122,15 @@ def fetch_dome_image(timeout=5):
         traceback.print_exc(file=sys.stdout)
         return None
 
-
-def fetch_acp_image(last_sha1, timeout=5):
-    try:
-        auth = netrc.netrc()
-        name, _, password = auth.authenticators('acp')
-        r = requests.get(ACP_URL, timeout=timeout, auth=HTTPBasicAuth(name, password))
-        if r.status_code != 200:
-            print('Failed to fetch image `{0}` (HTTP {1})'.format(ACP_URL, r.status_code))
-            return None, last_sha1
-
-        data = BytesIO(r.content)
-        sha1 = hashlib.sha1(data.getbuffer()).hexdigest()
-        if sha1 == last_sha1:
-            return None, last_sha1
-        return Image.open(data), sha1
-    except Exception:
-        print('Failed to fetch image `{0}` with exception:'.format(ACP_URL))
-        traceback.print_exc(file=sys.stdout)
-        return None, last_sha1
-
 try:
     with open(os.path.join(BASE_OUTPUT_DIR, 'metadata.json'), 'r', encoding='utf-8') as infile:
         data = json.load(infile)
         eumetsat_updated = Time(data['eumetsat_updated'])
         eumetsat_polled = Time(data['eumetsat_polled'])
-        acp_image_sha1 = data['acp_image_sha1']
 
 except Exception:
     eumetsat_updated = TIME_UNKNOWN
     eumetsat_polled = TIME_UNKNOWN
-    acp_image_sha1 = ''
 
 # EUMETSAT has a minimum cadence of 15 minutes, often 30 or 60 minutes
 if eumetsat_updated + 15 * u.minute < Time.now() and eumetsat_polled + 1 * u.minute < Time.now():
@@ -174,14 +151,8 @@ if webcam_image:
     webcam_image.save(os.path.join(BASE_OUTPUT_DIR, 'dome.jpg'), 'JPEG', quality=80,
                       optimize=True, progressive=True, clobber=True)
 
-telescope_image, acp_image_sha1 = fetch_acp_image(acp_image_sha1)
-if telescope_image:
-    telescope_image.save(os.path.join(BASE_OUTPUT_DIR, 'telescope.jpg'), 'JPEG', quality=80,
-                      optimize=True, progressive=True, clobber=True)
-
 with open(os.path.join(BASE_OUTPUT_DIR, 'metadata.json'), 'w', encoding='utf-8') as outfile:
     json.dump({
         'eumetsat_updated': eumetsat_updated.isot,
         'eumetsat_polled': eumetsat_polled.isot,
-        'acp_image_sha1': acp_image_sha1
     }, outfile)

@@ -6,3 +6,6 @@ Wants=update-dashboard-webcams.timer
 ExecStart=/usr/bin/update-dashboard-webcams
 Restart=always
 RestartSec=30
+
+[Install]
+WantedBy=multi-user.target

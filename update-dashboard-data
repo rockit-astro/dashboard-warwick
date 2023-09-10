@@ -45,17 +45,17 @@ def query_daemon(daemon, key, query):
         if response is None:
             if not key in status or status[key]:
                 print('received empty response from ' + key + '')
-                log.error('dashboardd', 'Lost contact with ' + key + ' (empty response)')
+                log.error('dashboardd@warwick', 'Lost contact with ' + key + ' (empty response)')
             status[key] = False
         else:
             if key in status and not status[key]:
-                log.info('dashboardd', 'Restored contact with ' + key)
+                log.info('dashboardd@warwick', 'Restored contact with ' + key)
             status[key] = True
             return response
     except Exception as e:
         print('failed to query ' + key + ' with error: ' + str(e))
         if not key in status or status[key]:
-            log.error('dashboardd', 'Lost contact with ' + key + ' (' + str(e) + ')')
+            log.error('dashboardd@warwick', 'Lost contact with ' + key + ' (' + str(e) + ')')
         status[key] = False
 
     return None
@@ -93,10 +93,9 @@ def generate_json(output_path, date):
     if environment:
         output.update(extract_environment_data(environment, {
             'vaisala': [
-                'wind_speed', 'median_wind_speed', 'temperature', 'relative_humidity', 'dew_point_delta',
-                'pressure'
+                'wind_gust', 'median_wind_speed', 'temperature', 'relative_humidity', 'dew_point_delta',
+                'pressure', 'rg11_unsafe'
             ],
-            'rain': ['unsafe_sensors'],
             'internal': ['temperature', 'humidity'],
             'cloudwatcher': ['sky_temp'],
             'diskspace': ['data_fs_available_bytes'],
@@ -104,9 +103,13 @@ def generate_json(output_path, date):
         }))
 
     output['power'] = query_daemon(daemons.warwick_power, 'power', lambda d: d.last_measurement())
-    output['acp'] = query_daemon(daemons.warwick_acp_monitor, 'acp', lambda d: d.last_measurement())
     output['dome'] = query_daemon(daemons.warwick_dome, 'dome', lambda d: d.status())
     output['operations'] = query_daemon(daemons.warwick_operations, 'operations', lambda d: d.status())
+    output['telescope'] = query_daemon(daemons.warwick_telescope, 'telescope', lambda d: d.report_status())
+    output['pipeline'] = query_daemon(daemons.warwick_pipeline, 'pipeline', lambda d: d.report_status())
+    output['camera'] = query_daemon(daemons.warwick_camera, 'camera', lambda d: d.report_status())
+    output['focuser'] = query_daemon(daemons.warwick_focuser, 'focuser', lambda d: d.report_status())
+    output['filterwheel'] = query_daemon(daemons.warwick_filterwheel, 'filterwheel', lambda d: d.report_status())
 
     try:
         with open(output_path, 'w') as output_file:

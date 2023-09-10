@@ -34,7 +34,8 @@ from flask import send_from_directory
 
 GENERATED_DATA_DIR = '/var/www/dashboard/generated'
 GENERATED_DATA = {
-
+    'preview/thumb': 'preview-thumb.jpg',
+    'preview/clip': 'preview-clip.jpg',
 }
 
 app = Flask(__name__, static_folder='../static')
@@ -71,7 +72,7 @@ def dashboard():
     return render_template('dashboard.html', cameras=cameras)
 
 
-@app.route('/environment')
+@app.route('/environment/')
 def environment():
     return render_template('environment.html')
 
@@ -93,6 +94,9 @@ def camera_thumb(camera):
 @app.route('/data/dashboard')
 def dashboard_data():
     data = json.load(open(GENERATED_DATA_DIR + '/dashboard.json'))
+    data['previews'] = {
+        'qhy600m': json.load(open(GENERATED_DATA_DIR + '/preview.json')),
+    }
     return jsonify(**data)
 
 
@@ -118,3 +122,44 @@ def environment_data():
     response.headers['Content-Encoding'] = 'gzip'
     response.headers['Access-Control-Allow-Origin'] = '*'
     return response
+
+
+@app.route('/data/log')
+def warwick_log():
+    return fetch_log_messages({
+        'powerd@warwick': 'power',
+        'meaded@warwick': 'mount',
+        'ashdomed@warwick': 'dome',
+        'opsd@warwick': 'ops',
+        'pipelined@warwick': 'pipeline',
+        'qhy_camd@warwick': 'camera',
+        'diskspaced@warwick': 'diskspace',
+
+        'environmentd@warwick': 'environment',
+        'dashboardd@warwick': 'dashboard',
+        'vaisalad@warwick': 'vaisala',
+        'cloudwatcherd@warwick': 'cloudwatcher',
+        'weatherlogd': 'weatherdb'
+    })
+
+def fetch_log_messages(sources):
+    if False:
+        db = pymysql.connect(db=DATABASE_DB, user=DATABASE_USER, autocommit=True)
+        try:
+            # Returns latest 250 log messages.
+            # If 'from' argument is present, returns latest 100 log messages with a greater id
+            with db.cursor() as cur:
+                args = list(sources.keys())
+                in_list = ','.join(['%s'] * len(args))
+                query = f'SELECT id, date, type, source, message from obslog WHERE source IN ({in_list})'
+                if 'from' in request.args:
+                    query += ' AND id > %s'
+                    args.append(request.args['from'])
+
+                query += ' ORDER BY id DESC LIMIT 250;'
+                cur.execute(query, args)
+                messages = [(x[0], x[1].isoformat(), x[2], sources[x[3]], x[4]) for x in cur]
+                return jsonify(messages=messages)
+        finally:
+            db.close()
+    return {}

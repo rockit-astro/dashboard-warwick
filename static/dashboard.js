@@ -1,21 +1,3 @@
-function updateListGroup(prefix, fields, data) {
-  for (var key in fields) {
-    var row = $('#'+prefix+'-'+key);
-    row.children('span.pull-right').remove();
-    row.attr('class', 'list-group-item');
-    var value = $('<span class="pull-right">');
-    var valueDisplay = fields[key](data);
-
-    if (valueDisplay.length > 0)
-      value.html(valueDisplay[0]);
-    if (valueDisplay.length > 1)
-      value.addClass(valueDisplay[1])
-    if (valueDisplay.length > 2)
-      row.addClass(valueDisplay[2])
-    row.append(value)
-  }
-}
-
 function parseUTCDate(str) {
   var d = str.match(/(\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+).(\d+)/);
   while (d[7] > 1000)
@@ -26,30 +8,56 @@ function parseUTCDate(str) {
 }
 
 function formatUTCDate(date) {
-  var d = [date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(),
+  let d = [date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(),
     date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds()];
 
-  for (i = 0; i < d.length; i++)
+  for (let i = 0; i < d.length; i++)
     if (d[i] < 10)
       d[i] = '0' + d[i];
 
-  return d[0] + '-' + d[1] + '-' + d[2] + ' ' + d[3] + ':' + d[4] + ':' + d[5];
+  return d[0] + '-' + d[1] + '-' + d[2] + '&nbsp;' + d[3] + ':' + d[4] + ':' + d[5];
 }
 
-function updateGroups(data) {
-  $('[data-generator]').each(function() {
+function sexagesimal(angle) {
+  const negative = angle < 0
+  angle = Math.abs(angle)
+
+  let degrees = Math.floor(angle)
+  angle = (angle - degrees) * 60
+  let minutes = Math.floor(angle)
+  let seconds = ((angle - minutes) * 60).toFixed(1)
+
+  if (degrees < 10)
+    degrees = '0' + degrees
+  if (minutes < 10)
+    minutes = '0' + minutes
+  if (seconds < 10)
+    seconds = '0' + seconds
+
+  if (negative)
+    degrees = '-' + degrees
+
+  return degrees + ':' + minutes + ':' + seconds
+}
+
+function updateGroups(data, filter = '') {
+  $(filter + ' [data-notify]').each(function () {
+    window[$(this).data('notify')]($(this), data);
+  });
+
+  $(filter + ' [data-generator]').each(function () {
     // Remove old content
     $(this).children('span.float-end').remove();
 
     if (!$(this).is("td"))
-    $(this).attr('class', 'list-group-item');
+      $(this).attr('class', 'list-group-item');
 
     // Add new content
     const generator = $(this).data('generator');
     const index = $(this).data('index');
 
     let fieldData = data;
-    for (var i in index) {
+    for (let i in index) {
       fieldData = fieldData && index[i] in fieldData ? fieldData[index[i]] : undefined;
       if (fieldData === undefined)
         break;
@@ -65,8 +73,10 @@ function updateGroups(data) {
     $(this).append(cell);
   });
 
-  const date = 'date' in data ? parseUTCDate(data['date']) : new Date();
-  $('#data-updated').html('Updated ' + formatUTCDate(date) + ' UTC');
+  if (filter.length === 0) {
+    const date = 'date' in data ? parseUTCDate(data['date']) : new Date();
+    $('#data-updated').html('Updated ' + formatUTCDate(date) + ' UTC');
+  }
 }
 
 function pollDashboard(url) {
@@ -75,15 +85,17 @@ function pollDashboard(url) {
     dataType: 'json',
     url: url,
     statusCode: {
-      404: function() {
+      404: function () {
         updateGroups({});
       }
     }
-  }).done(function(msg) {
+  }).done(function (msg) {
     updateGroups(msg);
   });
 
-  window.setTimeout(function() { pollDashboard(url); }, 10000);
+  window.setTimeout(function () {
+    pollDashboard(url);
+  }, 10000);
 }
 
 function getData(data, index) {
@@ -147,172 +159,66 @@ function envLatestMinMax(row, cell, data) {
   }
 }
 
-function diskSpaceGB(row, cell, data) {
-  if ('latest' in data) {
-    let display = +(data['latest'] / 1073741824).toFixed(1);
+function seeingIfAvailable(row, cell, data) {
+  if ('latest' in data && data['latest'] > 0) {
+    let display = data['latest'].toFixed(2);
     const units = row.data('units');
     if (units)
       display += units;
     cell.html(display);
-    cell.addClass(fieldLimitsColor(data, data['latest']));
-  }
-}
-
-function opsHeaderMode(row, cell, data) {
-  const modes = [
-    ['ERROR', 'list-group-item-danger'],
-    ['AUTO', 'list-group-item-success'],
-    ['MANUAL', 'list-group-item-warning'],
-  ];
-
-  const mode = data in modes ? modes[data] : mode[0];
-  cell.html(mode[0]);
-  row.addClass(mode[1]);
-}
-
-function opsHeaderEnvironment(row, cell, data) {
-  if (('safe' in data) && ('conditions' in data)) {
-    cell.html(data['safe'] ? 'SAFE' : 'NOT SAFE');
-    row.addClass(data['safe'] ? 'list-group-item-success' : 'list-group-item-danger');
   } else {
     cell.html('NO DATA');
     cell.addClass('text-danger');
   }
 }
 
-function powerOnOff(row, cell, data) {
-  if (data === 2) {
-    cell.html('ERROR');
-    cell.addClass('text-danger');
-  } else if (data === 1) {
-    cell.html('POWER ON');
-    cell.addClass('text-success');
-  } else {
-    cell.html('POWER OFF');
-    cell.addClass('text-danger');
+function opsConditionsTooltip(row, data) {
+  const status_classes = ['', 'text-success', 'text-warning', 'text-danger'];
+  const status_labels = ['UNKNOWN', 'SAFE', 'WARN', 'UNSAFE']
+  let tooltip = '<table style="margin: 5px">';
+  let rows = 0;
+  for (let c in data['conditions']) {
+    if (!(c in data['conditions']))
+      continue;
+
+    tooltip += '<tr><td style="text-align: right;">' + c + ':</td>';
+    const params = data['conditions'][c];
+    for (let p in params)
+      tooltip += '<td style="padding: 0 5px" class="' + status_classes[params[p]] + '">' + status_labels[params[p]] + '</td>';
+
+    tooltip += '</tr>';
+    rows += 1;
   }
+
+  if (rows === 0)
+    tooltip += '<tr><td style="text-align: center;">NO DATA</td></tr>'
+  tooltip += '</table>';
+
+  row.tooltip({
+    title: tooltip,
+    html: true,
+    sanitize: false,
+    animation: false,
+    container: 'body',
+    customClass: 'ops-tooltip'
+  });
 }
 
-function powerOffOn(row, cell, data) {
-  if (data === 2) {
-    cell.html('ERROR');
-    cell.addClass('text-danger');
-  } else if (data === 1) {
-    cell.html('POWER ON');
-    cell.addClass('text-danger');
-  } else {
-    cell.html('POWER OFF');
-    cell.addClass('text-success');
-  }
-}
+function opsStatus(row, cell, data) {
+  if ('safe' in data && 'conditions' in data && 'dome_closed' in data && 'dome_auto' in data) {
+    const mode_class = data['dome_auto'] ? 'text-success' : 'text-warning';
+    const mode_label = data['dome_auto'] ? 'AUTO' : 'MANUAL';
+    const dome_class = data['observable'] ^ data['dome_closed'] ? 'text-success' : 'text-danger';
+    const dome_label = data['dome_closed'] ? 'CLOSED' : 'OPEN';
+    let label = '<span class="' + mode_class + '">' + mode_label + '</span>&nbsp;/&nbsp;<span class="' + dome_class + '">' + dome_label + '</span>';
 
-function domeTime(row, cell, data) {
-  if (data == null)
-    cell.html('N/A');
-  else {
-    cell.html(data);
-    cell.addClass('text-warning');
-  }
-}
+    if (!data['safe'])
+      label += '&nbsp;(<span class="text-danger">ENV</span>)';
 
-function domeShutter(row, cell, data) {
-  const state = [
-    ['DISCONNECTED', 'text-danger'],
-    ['CLOSED', 'text-danger'],
-    ['OPEN', 'text-success'],
-    ['PARTIALLY OPEN', 'text-info'],
-    ['OPENING', 'text-warning'],
-    ['CLOSING', 'text-warning'],
-    ['FORCE CLOSING', 'text-danger']
-  ];
-
-  if (data >= 0 && data < state.length) {
-    cell.html(state[data][0]);
-    cell.addClass(state[data][1]);
-  } else {
-    cell.html('ERROR');
-    cell.addClass('text-danger');
-  }
-}
-
-function domeAzimuth(row, cell, data) {
-  const state = [
-    ['DISCONNECTED', 'text-danger'],
-    ['NOT HOMED', 'text-warning'],
-    ['IDLE', ''],
-    ['MOVING', 'text-warning'],
-    ['HOMING', 'text-warning'],
-  ];
-
-  if ('azimuth_status' in data) {
-    let label = state[data['azimuth_status']][0]
-    if (data['azimuth_status'] === 2) {
-      label += ' (' + data['azimuth'].toFixed(0) + ' deg)'
-    }
     cell.html(label);
-    cell.addClass(state[data['azimuth_status']][1]);
+    opsConditionsTooltip(row, data);
   } else {
-    cell.html('ERROR');
+    cell.html('NO DATA');
     cell.addClass('text-danger');
   }
 }
-
-function domeHeartbeat(row, cell, data) {
-  const state = [
-    ['DISABLED', 'text-warning'],
-    ['ACTIVE', 'text-success'],
-    ['CLOSING DOME', 'text-danger'],
-    ['TRIPPED', 'text-danger'],
-    ['UNAVAILABLE', 'text-warning']
-  ];
-
-  let label = 'DISCONNECTED';
-  let style = 'text-danger';
-
-  if ('heartbeat_status' in data && 'heartbeat_remaining' in data) {
-    if (data['heartbeat_status'] === 1) {
-      label = data['heartbeat_remaining'].toFixed(0) + 's remaining';
-      if (data['heartbeat_remaining'] < 30)
-        style = 'text-danger'
-      else if (data['heartbeat_remaining'] < 60)
-        style = 'text-warning';
-      else
-        style = 'text-success';
-    } else {
-      label = state[data['heartbeat_status']][0];
-      style = state[data['heartbeat_status']][1];
-    }
-  }
-
-  cell.html(label);
-  cell.addClass(style);
-}
-
-function acpInfo(row, cell, data){
-  cell.html(data.toUpperCase());
-}
-
-function acpRADec(row, cell, data) {
-  if (!('tel_status' in data))
-  {
-    cell.html('ERROR');
-    cell.addClass('text-danger');
-  } else if (data['tel_status'] === 'Offline') {
-    cell.html('N/A');
-  } else {
-    cell.html(data['tel_ra'] + ' / ' + data['tel_dec']);
-  }
-}
-function acpAltAz(row, cell, data){
-  if (!('tel_status' in data))
-  {
-    cell.html('ERROR');
-    cell.addClass('text-danger');
-  } else if (data['tel_status'] === 'Offline') {
-    cell.html('N/A');
-  } else {
-    cell.html(data['tel_alt'] + ' / ' + data['tel_az']);
-  }
-}
-
-

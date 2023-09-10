@@ -2,119 +2,129 @@
 {% set title = 'Windmill Hill Dashboard' -%}
 {% set active_page = 'dashboard' -%}
 {% block body %}
-
-<div class="row dashboard-stats mb-2">
-  <div class="col-md-4 col-sm-12 gy-2">
-    <div class="list-group">
-      <span class="list-group-item" data-index='["operations", "dome", "mode"]' data-generator="opsHeaderMode">Operations</span>
-    </div>
-  </div>
-  <div class="col-md-4 col-sm-12 gy-2">
-    <div class="list-group">
-      <span class="list-group-item text-center text-truncate" id="data-updated">Loading..</span>
-    </div>
-  </div>
-  <div class="col-md-4 col-sm-12 gy-2">
-    <div class="list-group">
-      <span class="list-group-item" data-index='["operations", "environment"]' data-generator="opsHeaderEnvironment" data-toggle="tooltip" data-placement="bottom" data-container="body" data-animation="false">Environment</span>
-    </div>
-  </div>
-</div>
-
-<div class="row dashboard-stats mb-2">
-  <div class="col-lg-4 col-sm-6 gy-2">
-    <div class="list-group">
-      <span class="list-group-item" data-index='["power", "telescope"]' data-generator="powerOnOff">Telescope</span>
-      <span class="list-group-item" data-index='["power", "camera"]' data-generator="powerOnOff">Camera</span>
-      <span class="list-group-item" data-index='["power", "focuser"]' data-generator="powerOnOff">Focuser</span>
-      <span class="list-group-item" data-index='["power", "filterwheel"]' data-generator="powerOnOff">Filter Wheel</span>
-      <span class="list-group-item" data-index='["diskspace", "data_fs_available_bytes"]' data-generator="diskSpaceGB" data-units=" GB">Disk Space</span>
-      <span class="list-group-item" data-index='["vaisala", "pressure"]' data-generator="envLatestMinMax" data-units=" hPa">Pressure</span>
-    </div>
-  </div>
-  <div class="col-lg-4 col-sm-6 gy-2">
-    <ul class="list-group">
-      <li class="list-group-item align-middle" data-index='["vaisala", "relative_humidity"]' data-generator="envLatestMinMax" data-units=" %RH">Ext. Humidity</li>
-      <li class="list-group-item align-middle" data-index='["internal", "humidity"]' data-generator="envLatestMinMax" data-units=" %RH">Int. Humidity</li>
-      <li class="list-group-item align-middle" data-index='["vaisala", "temperature"]' data-generator="envLatestMinMax" data-units=" &deg;C">Ext. Temp.</li>
-      <li class="list-group-item align-middle" data-index='["internal", "temperature"]' data-generator="envLatestMinMax" data-units=" &deg;C">Int. Temp.</li>
-      <li class="list-group-item align-middle" data-index='["vaisala", "dew_point_delta"]' data-generator="envLatestMinMax" data-units=" &deg;C">T > Dew Pt.</li>
-      <li class="list-group-item align-middle" data-index='["rain", "unsafe_sensors"]' data-generator="envLatestMinMax" data-units=" / 3" data-precision="0">Rain Detectors</li>
-    </ul>
-  </div>
-  <div class="col-lg-4 col-sm-6 gy-2">
-    <div class="list-group">
-      <span class="list-group-item" data-index='["vaisala", "wind_speed"]' data-generator="envLatestMinMax" data-units=" km/h">Peak Wind</span>
-      <span class="list-group-item" data-index='["vaisala", "median_wind_speed"]' data-generator="envLatestMinMax" data-units=" km/h">Median Wind</span>
-      <span class="list-group-item" data-index='["cloudwatcher", "sky_temp"]' data-generator="envLatestMinMax" data-units=" &deg;C">Sky Temp.</span>
-      <span class="list-group-item" data-index='["ephem", "sun_alt"]' data-generator="envLatestMinMax" data-units="&deg;">Sun Altitude</span>
-      <span class="list-group-item" data-index='["ephem", "moon_percent_illumination"]' data-generator="envLatestMinMax" data-units="%">Moon Illumination</span>
-      <span class="list-group-item" data-index='["ephem", "moon_alt"]' data-generator="envLatestMinMax" data-units="&deg;">Moon Altitude</span>
-    </div>
-  </div>
-  <div class="col-lg-4 col-sm-6 gy-2">
-    <div class="list-group">
-      <span class="list-group-item list-group-header text-center fw-bold">Telescope</span>
-      <span class="list-group-item" data-index='["acp", "tel_status"]' data-generator="acpInfo">Telescope</span>
-      <span class="list-group-item" data-index='["acp"]' data-generator="acpRADec">RA / Dec</span>
-      <span class="list-group-item" data-index='["acp"]' data-generator="acpAltAz">Alt / Az</span>
-      <span class="list-group-item" data-index='["acp", "cam_status"]' data-generator="acpInfo">Camera</span>
-      <span class="list-group-item" data-index='["acp", "cam_filter"]' data-generator="acpInfo">Filter</span>
-    </div>
-  </div>
-  <div class="col-lg-4 col-sm-6 gy-2">
-    <div class="list-group">
-      <span class="list-group-item list-group-header text-center fw-bold">Dome</span>
-      <span class="list-group-item" data-index='["dome"]' data-generator="domeAzimuth">Azimuth</span>
-      <span class="list-group-item" data-index='["dome", "shutter"]' data-generator="domeShutter">Shutter</span>
-      <span class="list-group-item" data-index='["dome"]' data-generator="domeHeartbeat">Heartbeat</span>
-      <span class="list-group-item" data-index='["operations", "dome", "open_date"]' data-generator="domeTime">Sched. Open</span>
-      <span class="list-group-item" data-index='["operations", "dome", "close_date"]' data-generator="domeTime">Sched. Close</span>
-    </div>
-  </div>
-  <div class="col-lg-4 col-sm-6 gy-2">
-    <div class="list-group">
-      <span class="list-group-item list-group-header text-center fw-bold">Plan</span>
-      <span class="list-group-item" data-index='["acp", "obs_status"]' data-generator="acpInfo">Status</span>
-      <span class="list-group-item" data-index='["acp", "obs_script"]' data-generator="acpInfo">Script</span>
-      <span class="list-group-item" data-index='["acp", "obs_activity"]' data-generator="acpInfo">Activity</span>
-      <span class="list-group-item" data-index='["acp", "obs_progress"]' data-generator="acpInfo">Progress</span>
-      <span class="list-group-item">&nbsp;</span>
-    </div>
-  </div>
-</div>
-<div class="row dashboard-stats mb-2">
-{% for c in cameras %}
-  <div class="col-lg-6 col-md-12 gy-2">
-  <div class="list-group">
-    <span class="list-group-item" id="{{ c.id }}" style="padding:0">
-      <img src="{{ c.camera_url }}" data-url="{{ c.camera_url }}" data-id="{{ c.id }}" alt="{{ c.label }}" width="100%">
-        <div id="{{ c.id }}-spinner" style="display: none; position: absolute; margin: auto; left: 0; right: 0; top: 0; bottom: 0; width: 64px; height: 64px;">
-        <div class="spinner-border" role="status">
-        <span class="visually-hidden">Loading...</span>
+    <div class="row dashboard-stats">
+        <div class="col-lg-3 col-md-6 col-xs-12 g-2">
+            <div class="list-group rounded-0">
+                <span class="list-group-item" data-index='["operations", "environment"]' data-generator="opsConditions" data-bs-toggle="tooltip" data-bs-placement="right">Environment</span>
+                <span class="list-group-item" data-index='["vaisala", "temperature"]' data-generator="envLatestMinMax" data-units=" &deg;C">Ext. Temperature</span>
+                <span class="list-group-item" data-index='["vaisala", "relative_humidity"]' data-generator="envLatestMinMax" data-units=" %RH">Ext. Humidity</span>
+                <span class="list-group-item" data-index='["vaisala", "dew_point_delta"]' data-generator="envLatestMinMax">T > Dew Pt.</span>
+                <span class="list-group-item" data-index='["vaisala", "rg11_unsafe"]' data-generator="envLatestMinMax" data-units=" / 3" data-precision="0">Rain Detectors</span>
+            </div>
         </div>
+        <div class="col-lg-3 col-md-6 col-xs-12 g-2">
+            <div class="list-group rounded-0">
+                <span class="list-group-item" data-index='["vaisala", "pressure"]' data-generator="envLatestMinMax" data-units=" hPa">Pressure</span>
+                <span class="list-group-item" data-index='["internal", "temperature"]' data-generator="envLatestMinMax" data-units=" &deg;C">Dome Temperature</span>
+                <span class="list-group-item" data-index='["internal", "humidity"]' data-generator="envLatestMinMax" data-units=" %RH">Dome Humidity</span>
+                <span class="list-group-item"data-index='["vaisala", "median_wind_speed"]' data-generator="envLatestMinMax" data-units=" km/h">Med. Wind</span>
+                <span class="list-group-item"data-index='["vaisala", "wind_gust"]' data-generator="envLatestMinMax" data-units=" km/h">Wind Gust</span>
+            </div>
         </div>
-      <div class="camera-label">{{ c.label }}</div>
-    </span>
-  </div>
-  </div>
-{% endfor %}
-</div>
+        <div class="col-lg-3 col-md-6 col-xs-12 g-2">
+            <div class="list-group rounded-0">
+                <span class="list-group-item" data-index='["cloudwatcher", "sky_temp"]' data-generator="envLatestMinMax" data-units=" &deg;C">Sky Temp.</span>
+                <span class="list-group-item" data-index='["ephem", "moon_percent_illumination"]' data-generator="envLatestMinMax" data-units="%">Moon Illumination</span>
+                <span class="list-group-item" data-index='["ephem", "moon_alt"]' data-generator="envLatestMinMax" data-units="&deg;">Moon Altitude</span>
+                <span class="list-group-item" data-index='["ephem", "sun_alt"]' data-generator="envLatestMinMax" data-units="&deg;">Sun Altitude</span>
+                <span class="list-group-item" data-index='["diskspace", "data_fs_available_bytes"]' data-generator="diskSpaceGB" data-units=" GB">Disk Space</span>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-xs-12 g-2">
+            <span class="m-0 text-center list-group-item" id="data-updated">Loading...</span>
+            <div class="list-group rounded-0">
+                <span class="list-group-item" data-index='["dome"]' data-generator="ashDomeState">Dome</span>
+                <span class="list-group-item" data-index='["dome"]' data-generator="ashDomeAzimuth">Azimuth</span>
+                <span class="list-group-item" data-index='["dome"]' data-generator="ashDomeAzControl">Az. Control</span>
+                <span class="list-group-item" data-index='["dome"]' data-generator="ashDomeHeartbeat">Heartbeat</span>
+            </div>
+        </div>
+    </div>
+    <div class="row dashboard-stats">
+        <div class="col-lg-6 col-md-12">
+            <div class="row">
+                <div class="col-12 g-2">
+                    <div class="list-group rounded-0">
+                        <div class="list-group-item overflow-y-scroll" style="height: 123px" data-index='["operations", "telescope"]' data-notify="opsActionsQueue">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 col-xs-12 g-2">
+                    <div class="list-group rounded-0">
+                        <span class="list-group-item" data-index='["operations", "dome"]' data-type="open" data-generator="opsDomeTime">Dome Open</span>
+                    </div>
+                </div>
+                <div class="col-md-6 col-xs-12 g-2">
+                    <div class="list-group rounded-0">
+                        <span class="list-group-item" data-index='["operations", "dome"]' data-type="close" data-generator="opsDomeTime">Dome Close</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-xs-12 g-2">
+            <div class="list-group rounded-0">
+                <span class="list-group-item" data-mount-index='["telescope"]' data-power-index='["power", "tel"]' data-generator="mountState">Mount</span>
+                <span class="list-group-item" data-index='["telescope"]' data-generator="mountRADec">RA / Dec</span>
+                <span class="list-group-item" data-index='["telescope"]' data-generator="mountAltAz">Alt / Az</span>
+                <span class="list-group-item" data-index='["telescope"]' data-generator="mountSunMoon">Sun / Moon Sep.</span>
+                <span class="list-group-item" data-focuser-index='["focuser"]' data-power-index='["power", "focus"]' data-generator="focusState">Focus</span>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-xs-12 g-2">
+            <div class="list-group rounded-0">
+                <span class="list-group-item" data-cam-index='["camera","state"]' data-power-index='["power", "cam"]'  data-generator="qhyState">Camera</span>
+                <span class="list-group-item" data-index='["camera"]' data-generator="qhyReadMode">Read Mode</span>
+                <span class="list-group-item" data-index='["camera"]' data-generator="qhyExposure">Exposure</span>
+                <span class="list-group-item" data-index='["camera"]' data-generator="qhyTemperature">Temperature</span>
+                <span class="list-group-item" data-filter-index='["filterwheel"]' data-power-index='["power", "filter"]' data-generator="cfwFilter">Filter</span>
+            </div>
+        </div>
+    </div>
+    <div id="preview-container" class="row dashboard-stats">
+        <div id="container" class="col-lg-8 col-md-12 g-2">
+            <div class="list-group list-group-item h-100 p-0 rounded-0" style="max-height: 502px">
+                <img id="preview-image" src="/data/preview/thumb" data-url="/data/preview/thumb" data-notify="previewImage" data-cam="qhy600m" width="100%" height="100%" class="bg-black object-fit-contain">
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-12 g-2">
+            <div class="row">
+                <div class="col mb-2">
+                    <div id="preview-info" class="list-group rounded-0">
+                        <span class="list-group-item fw-bold text-center">Preview</span>
+                        <span class="list-group-item" data-index='["previews"]' data-generator="previewTimestamp" data-cam="qhy600m" data-gps="['qhy600m']">Exposure started</span>
+                        <span class="list-group-item" data-index='["previews"]' data-generator="previewExposure" data-cam="qhy600m">Exposure length</span>
+                        <span class="list-group-item" data-index='["previews"]' data-generator="previewFilter" data-cam="qhy600m">Filter</span>
+                        <span class="list-group-item" data-index='["previews"]' data-generator="previewType" data-cam="qhy600m">Type</span>
+                        <span class="list-group-item" data-index='["previews"]' data-generator="previewOverheads" data-cam="qhy600m">Overheads</span>
+                        <span class="list-group-item" data-index='["previews"]' data-generator="previewFilename" data-cam="qhy600m">Saved as</span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="list-group rounded-0">
+                        <div class="list-group-item overflow-y-scroll pt-0" style="height: 262px">
+                            <table id="log-table" class="w-100"></table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<script src="{{ url_for('static', filename='dashboard.js') }}"></script>
-<script>
-  function reloadImages() {
-    $('img').each(function() {
-      // Only refresh images tagged with data-ural
-      const url = $(this).data('url');
-      if (url)
-        $(this).attr('src', url + '?' + Date.now());
-    });
-  }
+    <script src="{{ url_for('static', filename='dashboard.js') }}"></script>
+    <script src="{{ url_for('static', filename='rockit-dashboard.js') }}"></script>
+    <script src="{{ url_for('static', filename='fetch-logs.js') }}"></script>
+    <script>
+        $(document).ready(function () {
+            const initial_camera = $(location).attr('hash').substr(1);
+            if ($("#thumb-" + initial_camera).length > 0)
+                selectPreview(initial_camera);
 
-  $(document).ready(function() {
-    window.setInterval(reloadImages, 30000);
-    pollDashboard('/data/dashboard');
-  });
-</script>
+            pollDashboard('{{ url_for('dashboard_data') }}');
+            pollLog('{{ url_for('warwick_log') }}');
+        });
+    </script>
 {% endblock %}

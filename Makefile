@@ -4,4 +4,4 @@ install:
 	@cp update-dashboard-data update-dashboard-webcams /usr/bin/
 	@cp dashboard.service update-dashboard-data.service update-dashboard-webcams.service /usr/lib/systemd/system/
 	@cp dashboard.conf /etc/nginx/conf.d/
-	@chown -R www-data:www-data /var/www/dashboard
+	@chown -R nginx:nginx /var/www/dashboard
