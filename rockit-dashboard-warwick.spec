@@ -34,8 +34,6 @@ mkdir -p %{buildroot}/etc/nginx/conf.d/
 %files
 %defattr(0744,nginx,nginx,0755)
 /var/www/dashboard
-
-%defattr(0744,nfsnobody,nfsnobody,0755)
 /var/www/dashboard/generated
 
 %defattr(-,root,root,-)
