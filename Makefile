@@ -1,3 +1,15 @@
+RPMBUILD = rpmbuild --define "_topdir %(pwd)/build" \
+        --define "_builddir %{_topdir}" \
+        --define "_rpmdir %{_topdir}" \
+        --define "_srcrpmdir %{_topdir}" \
+        --define "_sourcedir %(pwd)"
+
+all:
+	mkdir -p build
+	${RPMBUILD} --define "_version $$(date --utc +%Y%m%d%H%M%S)" -ba rockit-dashboard-warwick.spec
+	mv build/noarch/*.rpm .
+	rm -rf build
+
 install:
 	@install -d /var/www/dashboard/generated
 	@cp -rv dashboard static dashboard.ini /var/www/dashboard/
