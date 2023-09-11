@@ -21,6 +21,7 @@ import os.path
 
 from astropy.time import Time
 import astropy.units as u
+import pymysql
 
 from flask import abort
 from flask import Flask
@@ -37,6 +38,9 @@ GENERATED_DATA = {
     'preview/thumb': 'preview-thumb.jpg',
     'preview/clip': 'preview-clip.jpg',
 }
+
+DATABASE_DB = 'ops'
+DATABASE_USER = 'ops'
 
 app = Flask(__name__, static_folder='../static')
 
@@ -115,7 +119,7 @@ def environment_data():
 
 @app.route('/data/log')
 def warwick_log():
-    return fetch_log_messages({
+    sources = {
         'powerd@warwick': 'power',
         'meaded@warwick': 'mount',
         'ashdomed@warwick': 'dome',
@@ -123,20 +127,18 @@ def warwick_log():
         'pipelined@warwick': 'pipeline',
         'qhy_camd@warwick': 'camera',
         'diskspaced@warwick': 'diskspace',
-
         'environmentd@warwick': 'environment',
         'dashboardd@warwick': 'dashboard',
         'vaisalad@warwick': 'vaisala',
         'cloudwatcherd@warwick': 'cloudwatcher',
         'weatherlogd': 'weatherdb'
-    })
+    }
 
-def fetch_log_messages(sources):
-    if False:
+    try:
         db = pymysql.connect(db=DATABASE_DB, user=DATABASE_USER, autocommit=True)
         try:
             # Returns latest 250 log messages.
-            # If 'from' argument is present, returns latest 100 log messages with a greater id
+            # If 'from' argument is present, returns latest 250 log messages with a greater id
             with db.cursor() as cur:
                 args = list(sources.keys())
                 in_list = ','.join(['%s'] * len(args))
@@ -151,4 +153,5 @@ def fetch_log_messages(sources):
                 return jsonify(messages=messages)
         finally:
             db.close()
-    return {}
+    except:
+        return {}
