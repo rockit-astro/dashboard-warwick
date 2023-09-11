@@ -37,7 +37,6 @@ import astropy.units as u
 
 BASE_OUTPUT_DIR = '/var/www/dashboard/generated/'
 EUMETSAT_URL = 'https://eumetview.eumetsat.int/static-images/MSG/IMAGERY/IR108/BW/WESTERNEUROPE/'
-DOME_URL = 'http://172.19.0.163/cgi-bin/snapshot.cgi'
 TIME_UNKNOWN = Time('2000-01-01T12:00:00')
 
 
@@ -94,31 +93,15 @@ def fetch_eumetsat_image(image_url, timeout=5):
         source = Image.open(BytesIO(r.content))
 
         # Crop to the UK
-        cropped = source.crop((162, 0, 162+960, 540))
+        cropped = source.crop((330, 0, 1020, 540))
 
         # Copy EUMETSAT watermark and metadata to bottom of cropped image
-        cropped.paste(source.crop((0, 852, 960, 892)), (0, 500, 960, 540))
-        cropped.paste(source.crop((728, 852, 1273, 892)), (415, 500, 960, 540))
+        cropped.paste(source.crop((0, 852, 690, 892)), (0, 500, 690, 540))
+        cropped.paste(source.crop((800, 852, 1270, 892)), (220, 500, 690, 540))
 
         return cropped
     except Exception:
         print('Failed to fetch image `{0}` with exception:'.format(image_url))
-        traceback.print_exc(file=sys.stdout)
-        return None
-
-
-def fetch_dome_image(timeout=5):
-    try:
-        auth = netrc.netrc()
-        name, _, password = auth.authenticators('dome_webcam')
-        r = requests.get(DOME_URL, timeout=timeout, auth=HTTPDigestAuth(name, password))
-        if r.status_code != 200:
-            print('Failed to fetch image `{0}` (HTTP {1})'.format(DOME_URL, r.status_code))
-            return None
-
-        return Image.open(BytesIO(r.content))
-    except Exception:
-        print('Failed to fetch image `{0}` with exception:'.format(DOME_URL))
         traceback.print_exc(file=sys.stdout)
         return None
 
@@ -143,13 +126,6 @@ if eumetsat_updated + 15 * u.minute < Time.now() and eumetsat_polled + 1 * u.min
                                 optimize=True, progressive=True, clobber=True)
 
             eumetsat_updated = eumetsat_date
-
-# Update local webcams every call
-
-webcam_image = fetch_dome_image()
-if webcam_image:
-    webcam_image.save(os.path.join(BASE_OUTPUT_DIR, 'dome.jpg'), 'JPEG', quality=80,
-                      optimize=True, progressive=True, clobber=True)
 
 with open(os.path.join(BASE_OUTPUT_DIR, 'metadata.json'), 'w', encoding='utf-8') as outfile:
     json.dump({

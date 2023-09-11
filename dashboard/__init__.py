@@ -51,25 +51,9 @@ def generated_data(path):
     abort(404)
 
 
-class SiteCamera:
-    def __init__(self, id, label, authorised=False, video=False, source=None):
-        self.id = id
-        self.label = label
-        self.source_url = source or ''
-        self.camera_url = '/camera/' + id
-        self.video_url = '/video/' + id if video and authorised else ''
-
-
 @app.route('/')
 def dashboard():
-    cameras = [
-        SiteCamera('eumetsat', 'EUMETSAT 10.8 um', source='https://eumetview.eumetsat.int/static-images/MSG/IMAGERY/IR108/BW/index.htm'),
-        SiteCamera('dome', 'Dome'),
-        SiteCamera('allsky', 'All-Sky'),
-        SiteCamera('telescope', 'Telescope'),
-    ]
-
-    return render_template('dashboard.html', cameras=cameras)
+    return render_template('dashboard.html')
 
 
 @app.route('/environment/')

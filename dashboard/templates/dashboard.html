@@ -114,11 +114,38 @@
             </div>
         </div>
     </div>
+    <div class="row dashboard-stats mb-2">
+        <div class="col-md-6 col-xs-12 g-2">
+            <div class="list-group rounded-0">
+                <div class="list-group-item p-0">
+                    <img src="/camera/eumetsat" data-camera-url="/camera/eumetsat" alt="EUMETSAT 10.8 um" width="100%">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xs-12 g-2">
+            <div class="list-group rounded-0">
+                <div class="list-group-item p-0">
+                    <img src="/camera/allsky" data-camera-url="/camera/allsky" alt="All-sky" width="100%">
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
+
 <script src="{{ url_for('static', filename='dashboard.js') }}"></script>
 <script src="{{ url_for('static', filename='rockit-dashboard.js') }}"></script>
 <script src="{{ url_for('static', filename='fetch-logs.js') }}"></script>
 <script>
+    function reloadCameraImages() {
+        $('img').each(function() {
+            // Only refresh images tagged with data-camera-url
+            const url = $(this).data('camera-url');
+            if (url)
+                $(this).attr('src', url + '?' + Date.now());
+        });
+    }
+
     $(document).ready(function () {
         const initial_camera = $(location).attr('hash').substr(1);
         if ($("#thumb-" + initial_camera).length > 0)
@@ -126,6 +153,6 @@
 
         pollDashboard('{{ url_for('dashboard_data') }}');
         pollLog('{{ url_for('warwick_log') }}');
+        window.setInterval(reloadCameraImages, 10000);
     });
-</script>
-{% endblock %}
+</script>{% endblock %}
