@@ -24,6 +24,7 @@ mkdir -p %{buildroot}%{_bindir}
 
 mkdir -p %{buildroot}%{_unitdir}
 %{__install} %{_sourcedir}/dashboard.service %{buildroot}%{_unitdir}
+%{__install} %{_sourcedir}/dashboard-vnc-websocket.service %{buildroot}%{_unitdir}
 %{__install} %{_sourcedir}/update-dashboard-data.service %{buildroot}%{_unitdir}
 %{__install} %{_sourcedir}/update-dashboard-webcams.service %{buildroot}%{_unitdir}
 
@@ -39,6 +40,7 @@ mkdir -p %{buildroot}/etc/nginx/conf.d/
 
 %defattr(-,root,root,-)
 %{_unitdir}/dashboard.service
+%{_unitdir}/dashboard-vnc-websocket.service
 %{_unitdir}/update-dashboard-data.service
 %{_unitdir}/update-dashboard-webcams.service
 %{_bindir}/update-dashboard-data

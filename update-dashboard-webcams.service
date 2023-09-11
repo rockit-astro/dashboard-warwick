@@ -1,6 +1,5 @@
 [Unit]
 Description=Polls observatory webcams and updates the cached dashboard images
-Wants=update-dashboard-webcams.timer
 
 [Service]
 ExecStart=/usr/bin/update-dashboard-webcams
