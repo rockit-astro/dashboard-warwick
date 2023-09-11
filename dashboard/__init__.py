@@ -77,6 +77,11 @@ def environment():
     return render_template('environment.html')
 
 
+@app.route('/vnc/')
+def vnc():
+    return render_template('vnc.html')
+
+
 @app.route('/camera/<path:camera>')
 def camera_image(camera):
     if camera in ['eumetsat', 'allsky', 'dome', 'telescope']:

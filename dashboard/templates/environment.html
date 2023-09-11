@@ -2,7 +2,7 @@
 {% set title = 'Environment' -%}
 {% set active_page = 'environment' -%}
 {% block body %}
-
+<div class="container">
 <div class="row mb-2">
   <div class="col-md-8 col-sm-12 gy-2 mt-auto text-center">
     <span class="text-truncate" id="data-updated">Loading..</span>
@@ -45,6 +45,7 @@
       <div id="rainboards-plot" data-linkedplots='["windspeed-plot"]' class="weather-plot" data-type='rain' data-sidesensor="right-container" data-axislabel="Rain Det." data-labelfudge="-7" data-min="0" data-max="3.5" data-labelunits='&nbsp;boards' data-ydecimals="0"></div>
     </div>
   </div>
+</div>
 </div>
 <script src="{{ url_for('static', filename='datepicker.min.js') }}"></script>
 <script src="{{ url_for('static', filename='jquery.flot.min.js') }}"></script>

@@ -95,12 +95,13 @@
                 <li class="nav-item">
                     <a class="nav-link fw-normal text-nowrap{% if active_page == 'environment' %} active{% endif %}" href="{{ url_for('environment') }}"><i class="bi-cloud-drizzle" style="margin-right:5px"></i>Weather DB</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link fw-normal text-nowrap{% if active_page == 'vnc' %} active{% endif %}" href="{{ url_for('vnc') }}"><i class="bi-pc-display-horizontal" style="margin-right:5px"></i>Control</a>
+                </li>
             </ul>
         </div>
     </div>
 </nav>
-<div class="container">
-    {% block body %}{% endblock %}
-</div>
+{% block body %}{% endblock %}
 </body>
 </html>

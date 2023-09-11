@@ -2,6 +2,7 @@
 {% set title = 'Windmill Hill Dashboard' -%}
 {% set active_page = 'dashboard' -%}
 {% block body %}
+<div class="container">
     <div class="row dashboard-stats">
         <div class="col-lg-3 col-md-6 col-xs-12 g-2">
             <div class="list-group rounded-0">
@@ -113,18 +114,18 @@
             </div>
         </div>
     </div>
+</div>
+<script src="{{ url_for('static', filename='dashboard.js') }}"></script>
+<script src="{{ url_for('static', filename='rockit-dashboard.js') }}"></script>
+<script src="{{ url_for('static', filename='fetch-logs.js') }}"></script>
+<script>
+    $(document).ready(function () {
+        const initial_camera = $(location).attr('hash').substr(1);
+        if ($("#thumb-" + initial_camera).length > 0)
+            selectPreview(initial_camera);
 
-    <script src="{{ url_for('static', filename='dashboard.js') }}"></script>
-    <script src="{{ url_for('static', filename='rockit-dashboard.js') }}"></script>
-    <script src="{{ url_for('static', filename='fetch-logs.js') }}"></script>
-    <script>
-        $(document).ready(function () {
-            const initial_camera = $(location).attr('hash').substr(1);
-            if ($("#thumb-" + initial_camera).length > 0)
-                selectPreview(initial_camera);
-
-            pollDashboard('{{ url_for('dashboard_data') }}');
-            pollLog('{{ url_for('warwick_log') }}');
-        });
-    </script>
+        pollDashboard('{{ url_for('dashboard_data') }}');
+        pollLog('{{ url_for('warwick_log') }}');
+    });
+</script>
 {% endblock %}
