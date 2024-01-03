@@ -2,7 +2,7 @@ Name:      rockit-dashboard-warwick
 Version:   %{_version}
 Release:   1
 Url:       https://github.com/rockit-astro/dashboard-warwick
-Summary:   Web dashboard for the Windmill Hill Observatory.
+Summary:   Web dashboard for the Marsh Observatory.
 License:   GPL-3.0
 Group:     Unspecified
 BuildArch: noarch
