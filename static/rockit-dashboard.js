@@ -427,7 +427,7 @@ function ashDomeHeartbeat(row, cell, data) {
     label = 'N/A';
     style = '';
   } else if (status === 1 && remaining !== undefined) {
-    label = remaining + 's remaining';
+    label = remaining.toFixed(0) + 's remaining';
       if (data['heartbeat_remaining'] < 30)
         style = 'text-danger'
       else if (remaining < 60)
