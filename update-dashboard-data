@@ -96,7 +96,7 @@ def generate_json(output_path, date):
                 'wind_gust', 'median_wind_speed', 'temperature', 'relative_humidity', 'dew_point_delta',
                 'pressure', 'rg11_unsafe'
             ],
-            'internal': ['temperature', 'humidity'],
+            'internal': ['temperature', 'relative_humidity', 'dew_point_delta'],
             'cloudwatcher': ['sky_temp'],
             'diskspace': ['data_fs_available_bytes'],
             'ephem': ['sun_alt', 'moon_alt', 'moon_percent_illumination']
