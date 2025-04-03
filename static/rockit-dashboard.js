@@ -347,7 +347,8 @@ function domeHeartbeat(row, cell, data) {
 
 function ashDomeState(row, cell, data) {
   const shutter = getData(data, ["shutter"]);
-  const azimuth = getData(data, ["azimuth_status"]);
+  const tracking_ra = getData(data, ["tracking_ra"]);
+  let azimuth = getData(data, ["azimuth_status"]);
 
   const shutter_state = [
     ['DISCONNECTED', 'text-danger'],
@@ -364,7 +365,10 @@ function ashDomeState(row, cell, data) {
     ['NOT HOMED', 'text-danger'],
     ['IDLE', ''],
     ['MOVING', 'text-warning'],
-    ['HOMING', 'text-warning']
+    ['HOMING', 'text-warning'],
+
+    // Fake state created by checking tracking_ra
+    ['TRACKING', 'text-success']
   ];
 
   if (shutter === undefined || azimuth === undefined) {
@@ -374,6 +378,9 @@ function ashDomeState(row, cell, data) {
     cell.html('DISCONNECTED');
     cell.addClass('text-danger');
   } else {
+    if (azimuth === 2 && tracking_ra !== undefined)
+      azimuth = 5;
+
     const s = shutter_state[shutter];
     const a = azimuth_state[azimuth];
     let label = '<span class="' + s[1] + '">' + s[0] + '</span>&nbsp;/&nbsp;<span class="' + a[1] + '">' + a[0] + '</span>';
