@@ -1,6 +1,6 @@
 Name:      rockit-dashboard-warwick
 Version:   %{_version}
-Release:   1
+Release:   1%{dist}
 Url:       https://github.com/rockit-astro/dashboard-warwick
 Summary:   Web dashboard for the Marsh Observatory.
 License:   GPL-3.0
