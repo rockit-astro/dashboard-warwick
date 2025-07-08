@@ -6,7 +6,7 @@ Summary:   Web dashboard for the Marsh Observatory.
 License:   GPL-3.0
 Group:     Unspecified
 BuildArch: noarch
-Requires:  nginx python3-flask python3-websockify python3-rockit-common uwsgi uwsgi-plugin-python3
+Requires:  nginx python3-astropy python3-flask python3-websockify python3-rockit-common uwsgi uwsgi-plugin-python3
 Requires:  mariadb-server rockit-obslog-server rockit-obslog-data-warwick rockit-weatherlog-warwick
 
 %description

@@ -20,8 +20,8 @@
 
 """Run from a systemd timer to generate status json that is served by the web dashboard"""
 
-import datetime
 import json
+from astropy.time import Time
 from rockit.common import daemons, log
 
 # This directory must be shared with the TCS via NFS
@@ -121,6 +121,4 @@ def generate_json(output_path, date):
         print('failed to write json with error: ' + str(e))
         log.error('dashboardd', 'Failed to write json (' + str(e) + ')')
 
-
-date = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f')
-generate_json(BASE_OUTPUT_DIR + '/dashboard.json', date)
+generate_json(BASE_OUTPUT_DIR + '/dashboard.json', Time.now().isot)

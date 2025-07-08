@@ -164,9 +164,8 @@ def environment_data():
     path = 'latest.json.gz'
     if 'date' in request.args:
         # Map today's date to today.json
-        # HACK: use .datetime to work around missing strftime on ancient astropy
         now = Time.now()
-        today = Time(now.datetime.strftime('%Y-%m-%d'), format='isot', scale='utc') + 12 * u.hour
+        today = Time(now.strftime('%Y-%m-%d'), format='isot', scale='utc') + 12 * u.hour
         if today > now:
             today -= 1 * u.day
 
