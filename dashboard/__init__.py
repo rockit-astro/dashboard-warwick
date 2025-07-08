@@ -18,7 +18,6 @@
 
 import json
 import os.path
-import stat
 
 from astropy.time import Time
 import astropy.units as u
@@ -27,17 +26,11 @@ import pymysql
 from flask import abort
 from flask import Flask
 from flask import jsonify
-from flask import redirect
 from flask import render_template
 from flask import request
 from flask import send_from_directory
-from flask import url_for
 
-from werkzeug.security import safe_join
-from werkzeug.utils import secure_filename
 # pylint: disable=missing-docstring
-
-FILES_ROOT = '/home/observer/Public'
 
 GENERATED_DATA_DIR = '/var/www/dashboard/generated'
 GENERATED_DATA = {
@@ -69,71 +62,6 @@ def dashboard():
 @app.route('/environment/')
 def environment():
     return render_template('environment.html')
-
-
-@app.route('/vnc/')
-def vnc():
-    return render_template('vnc.html')
-
-
-@app.route('/files/', methods=['GET', 'POST'])
-@app.route('/files/<path:directory>', methods=['GET', 'POST'])
-def files(directory=''):
-    path = safe_join(FILES_ROOT, directory)
-    if path is None:
-        return abort(403)
-
-    if request.method == 'POST':
-        # check if the post request has the file part
-        if 'file' not in request.files:
-            return redirect(request.url)
-
-        f = request.files['file']
-        if f and f.filename:
-            filename = secure_filename(f.filename)
-            f.save(os.path.join(path, filename))
-            return redirect(request.url)
-
-    table = []
-    if directory:
-        parent = safe_join(FILES_ROOT, os.path.join(directory, '..'))
-        if parent:
-            info = os.stat(parent)
-            modified = Time(info.st_mtime, format='unix').strftime('%Y-%m-%d&nbsp;%H:%M:%S')
-            table.append((url_for('files', directory=os.path.join(directory, '..')), 'bi-folder2', '..', modified, '-'))
-
-    units = ['B', 'KiB', 'MiB', 'GiB']
-    for filename in os.listdir(path):
-        if filename.startswith('.'):
-            continue
-        try:
-            info = os.stat(os.path.join(path, filename))
-            if stat.S_ISDIR(info.st_mode):
-                url = url_for('files', directory=os.path.join(directory, filename))
-                icon = 'bi-folder2'
-                size = '-'
-            else:
-                url = url_for('file', path=os.path.join(directory, filename))
-                icon = 'bi-file-earmark'
-                size = info.st_size
-                i = 0
-                while size > 1024 and i < len(units):
-                    size /= 1024
-                    i += 1
-
-                size = f'{size:.2f}&nbsp;{units[i]}'
-
-            modified = Time(info.st_mtime, format='unix').strftime('%Y-%m-%d&nbsp;%H:%M:%S')
-            table.append((url, icon, filename, modified, size))
-        except:
-            pass
-
-    return render_template('files.html', table=table, directory=directory)
-
-
-@app.route('/file/<path:path>')
-def file(path):
-    return send_from_directory(FILES_ROOT, path)
 
 
 @app.route('/camera/<path:camera>')
